@@ -27,7 +27,6 @@ requirements = [
     "opencv-python-headless",
     "yt_dlp",
     "requests",
-    "asyncio",
 ]
 
 
