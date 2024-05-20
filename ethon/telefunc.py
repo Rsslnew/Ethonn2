@@ -27,7 +27,7 @@ def time_formatter(milliseconds: int) -> str:
         + ((str(seconds) + "s:") if seconds else "")
     )
     if tmp.endswith(":"):
-        return tmp[:-1]
+        return tmp[:-2]
     else:
         return tmp
 
@@ -49,27 +49,26 @@ async def progress(current, total, event, start, type_of_ps, file=None):
         percentage = current * 100 / total
         speed = current / diff
         time_to_completion = round((total - current) / speed) * 1000
-        progress_str = "**[{0}{1}]** `| {2}%`\n\n".format(
-            "".join(["🟩" for i in range(math.floor(percentage / 10))]),
-            "".join(["⬜️" for i in range(10 - math.floor(percentage / 10))]),
+        progress_str = "`[{0}{1}] {2}%`\n\n".format(
+            "".join(["●" for i in range(math.floor(percentage / 5))]),
+            "".join(["○" for i in range(20 - math.floor(percentage / 5))]),
             round(percentage, 2),
         )
         tmp = (
             progress_str
-            + "📦 GROSS: {0} of {1}\n\n🚀 Speed: {2}/s\n\n⏱️ ETA: {3}\n\n".format(
+            + "`{0} of {1}`\n\n`✦ Speed: {2}/s`\n\n`✦ ETA: {3}`\n\n".format(
                 hbs(current),
                 hbs(total),
                 hbs(speed),
-                time_formatter(time_to_completion),
+                ts(time_to_completion),
             )
         )
         if file:
             await event.edit(
-                "{}\n\n`File Name: {}\n\n{}".format(type_of_ps, file, tmp)
+                "`✦ {}`\n\n`File Name: {}`\n\n{}".format(type_of_ps, file, tmp)
             )
         else:
-            await event.edit("{}\n\n{}".format(type_of_ps, tmp))
-
+            await event.edit("`✦ {}`\n\n{}".format(type_of_ps, tmp))
 
 #Why these methods? : Using progress of telethon makes upload/download slow due to callbacks
 #these method allows to upload/download in fastest way with progress bars.
@@ -128,3 +127,19 @@ async def force_sub(client, channel, id, ft):
     except Exception:
         s, r = True, "ERROR: Add in ForceSub channel, or check your channel id."
     return s, r
+
+def stdr(seconds: int) -> str:
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    if len(str(minutes)) == 1:
+        minutes = "0" + str(minutes)
+    if len(str(hours)) == 1:
+        hours = "0" + str(hours)
+    if len(str(seconds)) == 1:
+        seconds = "0" + str(seconds)
+    dur = (
+        ((str(hours) + ":") if hours else "00:")
+        + ((str(minutes) + ":") if minutes else "00:")
+        + ((str(seconds)) if seconds else "")
+    )
+    return dur
